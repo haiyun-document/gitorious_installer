@@ -8,7 +8,7 @@ DEPS=(build-essential  zlib1g-dev tcl-dev libexpat1-dev libxslt1-dev 	\
 		libmysqlclient-dev apache2-threaded-dev libonig-dev ruby-dev rubygems 	\
 		libruby libdbd-mysql-ruby libmysql-ruby 				\
 		libmagick++-dev zip unzip memcached git-core git-svn git-doc 	\
-		git-cvs ruby)
+		git-cvs ruby wget)
 		
 MISSING_DEPS=()	
 for DEP in "${DEPS[@]}"; do
