@@ -42,6 +42,8 @@ for DEP in "${DEPS[@]}"; do
 	fi
 done
 
+read -p "PAUSE" CONTINUE
+
 if [ ${#MISSING_DEPS[@]} -gt 0 ]
 then
 	echo "You are missing: ${MISSING_DEPS[@]} "
@@ -60,6 +62,8 @@ gem install --no-ri --no-rdoc -v 0.8.7 rake
 gem install --no-ri --no-rdoc -v 1.1.0 daemons
 gem install -b --no-ri --no-rdoc rmagick stompserver passenger bundler
 
+read -p "PAUSE" CONTINUE
+
 ## Compile and install sphinx
 cd /tmp
 wget http://sphinxsearch.com/files/sphinx-0.9.9.tar.gz
@@ -68,12 +72,16 @@ cd sphinx-0.9.9
 ./configure --prefix=/usr
 make all install
 
+read -p "PAUSE" CONTINUE
+
 ## Clone Gitorious
 git clone git://gitorious.org/gitorious/mainline.git /var/www/gitorious
 cd /var/www/gitorious
 git submodule init
 git submodule update
 ln -s /var/www/gitorious/script/gitorious /usr/bin
+
+read -p "PAUSE" CONTINUE
 
 ## Startup scripts
 cp scripts/{git-{daemon,poller,ultrasphinx},stomp} /etc/init.d/
@@ -83,6 +91,8 @@ update-rc.d git-daemon defaults
 update-rc.d git-poller defaults
 update-rc.d git-ultrasphinx defaults
 update-rc.d stomp defaults
+
+read -p "PAUSE" CONTINUE
 
 ## Make directories
 function make_dir {
@@ -100,6 +110,7 @@ touch /var/www/gitorious/.ssh/authorized_keys
 chmod 700 /var/www/gitorious/.ssh
 chmod 600 /var/www/gitorious/.ssh/authorized_keys
 
+read -p "PAUSE" CONTINUE
 
 ## Compile and load passenger for Apache
 $(gem contents passenger | grep passenger-install-apache2-module)
@@ -114,10 +125,14 @@ EOF
 cat /etc/apache2/mods-available/passenger.load
 service apache2 reload
 
+read -p "PAUSE" CONTINUE
+
 ## Add modules
 a2enmod passenger
 a2enmod rewrite
 a2enmod ssl
+
+read -p "PAUSE" CONTINUE
 
 ## Write Apache configuration files
 read -p "Enter server name [git.example.com]: " SERVER_NAME
@@ -141,6 +156,8 @@ cat <<EOF > /etc/apache2/sites-available/gitorious-ssl
 </IfModule>
 EOF
 
+read -p "PAUSE" CONTINUE
+
 ## Disable default site
 a2dissite default
 a2dissite default-ssl
@@ -151,6 +168,8 @@ a2ensite gitorious-ssl
 
 service apache2 reload
 
+read -p "PAUSE" CONTINUE
+
 ## Get MySQL root password
 read -s -p "Enter mysql root password: " MYSQL_PASSWD
 echo -e "\n"
@@ -158,10 +177,14 @@ echo -e "\n"
 ## Create gitorious_production database
 mysql -u root -p"${MYSQL_PASSWD}" -e "CREATE DATABASE gitorious_production"
 
+read -p "PAUSE" CONTINUE
+
 ## Install correct gems
 cd /var/www/gitorious
 bundle install
 bundle pack
+
+read -p "PAUSE" CONTINUE
 
 ## Create user git
 adduser --system --home /var/www/gitorious/ --no-create-home --group --shell /bin/bash git && \
@@ -220,26 +243,36 @@ if [ "${PRIVATE_MODE}" = "y" ] ; then
 	sed -i 's/#public_mode: true/public_mode: false/g' /var/www/gitorious/config/gitorious.yml 
 fi
 
+read -p "PAUSE" CONTINUE
+
 ## MySQL password
 read -s -p "Enter root password fro mysql" MYSQL_PASSWD
 sed -i 's/password:/password: ${MYSQL_PASSWD}/g' /var/www/gitorious/config/database.yml 
 
 
-
+## Set up the databases
 mv config/boot.rb config/boot.rb.orig
 echo "require 'thread'" > config/boot.rb.orig
 cat config/boot.rb.orig >> config.boot.rb
+
+read -p "PAUSE" CONTINUE
 
 su - git -c 'bundle install'
 su - git -c 'bundle pack'
 su - git -c 'rake db:migrate RAILS_ENV=production'
 su - git -c 'rake ultrasphinx:bootstrap RAILS_ENV=production'
 
+read -p "PAUSE" CONTINUE
+
 echo "* * * * * cd /var/www/gitorious && /usr/bin/bundle exec rake ultrasphinx:index RAILS_ENV=production" \
 	>> /var/spool/cron/crontabs/git
 
 chown git:crontab /var/spool/cron/crontabs/git
 chmod 600 /var/spool/cron/crontabs/git
+
+chown -R git:git /var/www/gitorious
+
+read -p "PAUSE" CONTINUE
 
 env RAILS_ENV=production ruby1.8 script/create_admin
 
