@@ -10,3 +10,7 @@ DIRS=(/var/www/gitorious/tmp/pids /tmp/tarball-work /var/www/gitorious/tarballs
 for DIR in ${DIRS[@]}; do
 	make_dir ${DIR}
 done
+
+touch /var/www/gitorious/.ssh/authorized_keys 
+chmod 700 /var/www/gitorious/.ssh
+chmod 600 /var/www/gitorious/.ssh/authorized_keys
