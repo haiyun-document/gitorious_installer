@@ -32,7 +32,7 @@ EOF
 a2dissite default
 a2dissite default-ssl
 
-## Enable gitorious site
+## Enable gitorious sites
 a2ensite gitorious
 a2ensite gitorious-ssl
 
