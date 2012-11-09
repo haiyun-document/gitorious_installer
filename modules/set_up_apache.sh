@@ -7,7 +7,7 @@ a2enmod rewrite
 a2enmod ssl
 
 ## Write Apache configuration files
-read -p "Input your server name [ex. git.example.com]: " SERVER_NAME
+read -p "Enter server name [git.example.com]: " SERVER_NAME
 
 cat <<EOF > /etc/apache2/sites-available/gitorious
 <VirtualHost *:80>
