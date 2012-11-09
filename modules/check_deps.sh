@@ -1,14 +1,14 @@
 #!/bin/bash
 
 ## This section will check necessary dependecies
-DEPS=(build-essential  zlib1g-dev tcl-dev libexpat-dev libxslt1-dev 	\
+DEPS=(build-essential  zlib1g-dev tcl-dev libexpat1-dev libxslt1-dev 	\
 		libcurl4-openssl-dev postfix apache2 mysql-server mysql-client 	\
 		apg geoip-bin libgeoip1 libgeoip-dev sqlite3 libsqlite3-dev 	\
 		imagemagick libpcre3 libpcre3-dev zlib1g zlib1g-dev libyaml-dev \
-		libmysqlclient15-dev apache2-dev libonig-dev ruby-dev rubygems 	\
-		libopenssl-ruby libdbd-mysql-ruby libmysql-ruby 				\
+		libmysqlclient-dev apache2-threaded-dev libonig-dev ruby-dev rubygems 	\
+		libruby libdbd-mysql-ruby libmysql-ruby 				\
 		libmagick++-dev zip unzip memcached git-core git-svn git-doc 	\
-		git-cvs irb)
+		git-cvs ruby)
 		
 MISSING_DEPS=()	
 for DEP in "${DEPS[@]}"; do
