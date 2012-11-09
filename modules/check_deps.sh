@@ -20,8 +20,13 @@ done
 
 if [ ${#MISSING_DEPS[@]} -gt 0 ]
 then
-	echo "You are missing: "
-	for MISSING_DEP in "${MISSING_DEPS[@]}"; do
-		echo $MISSING_DEP
-	done
+	echo "You are missing: ${MISSING_DEPS[@]} "
+	read -p "Install missing packages? [Y/n] " INSTALL_MISSING_PKGS
+	INSTALL_MISSING_PKGS=`echo "${INSTALL_MISSING_PKGS}" | tr '[A-Z]' '[a-z]'`
+	
+	if [ "${INSTALL_MISSING_PKGS}" = "y" ] || [ -z "${INSTALL_MISSING_PKGS}" ]; then
+		apt-get install -y "${MISSING_DEPS[@]}"
+	fi
 fi
+
+
