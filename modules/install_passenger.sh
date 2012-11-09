@@ -1,5 +1,5 @@
 #!/bin/bash
-$(gem contents passenger | grep passenger-install-apache2-module)
+#$(gem contents passenger | grep passenger-install-apache2-module)
 MOD_PASSENGER_LOC=`find /usr/lib/ruby/gems -name mod_passenger.so`
 
 cat <<EOF > /etc/apache2/mods-available/passenger.load
