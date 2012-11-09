@@ -1,7 +1,8 @@
 #!/bin/bash
+## Set up the databases
 mv config/boot.rb config/boot.rb.orig
-echo "require 'thread'" > config/boot.rb.orig
-cat config/boot.rb.orig >> config.boot.rb
+echo "require 'thread'" > config/boot.rb
+cat config/boot.rb.orig >> config/boot.rb
 
 su - git -c 'bundle install'
 su - git -c 'bundle pack'

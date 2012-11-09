@@ -24,13 +24,13 @@ COOKIE_SECRET=`apg -d -m 64`
 sed -i 's/\/var\/git\/repositories/\/var\/www\/gitorious\/repositories/g' /var/www/gitorious/config/gitorious.yml 
 sed -i 's/\/var\/git\/tarballs/\/var\/www\/gitorious\/tarballs/g' /var/www/gitorious/config/gitorious.yml 
 sed -i 's/\/var\/git\/tarballs-work/\/tmp\/tarballs-work/g' /var/www/gitorious/config/gitorious.yml 
-sed -i 's/ssssht/${COOKIE_SECRET}/g' /var/www/gitorious/config/gitorious.yml 
+sed -i "s/ssssht/${COOKIE_SECRET}/g" /var/www/gitorious/config/gitorious.yml 
 read -p "Enter server name [git.example.com]: " SERVER_NAME
-sed -i 's/gitorious_host: gitorious.test/gitorious_host: ${SERVER_NAME}/g' /var/www/gitorious/config/gitorious.yml 
+sed -i "s/gitorious_host: gitorious.test/gitorious_host: ${SERVER_NAME}/g" /var/www/gitorious/config/gitorious.yml 
 sed -i 's/#hide_http_clone_urls: false/hide_http_clone_urls: true/g' /var/www/gitorious/config/gitorious.yml 
 sed -i 's/#is_gitorious_dot_org: true/is_gitorious_dot_org: false/g' /var/www/gitorious/config/gitorious.yml 
 read -p "Enter admin email [admin@example.com]: " ADMIN_EMAIL
-sed -i 's/exception_notification_emails:/exception_notification_emails: ${ADMIN_EMAIL}/g' /var/www/gitorious/config/gitorious.yml 
+sed -i "s/exception_notification_emails:/exception_notification_emails: ${ADMIN_EMAIL}/g" /var/www/gitorious/config/gitorious.yml 
 
 ## Private repositories
 cat <<EOF
@@ -64,25 +64,8 @@ fi
 
 ## MySQL password
 read -s -p "Enter root password fro mysql" MYSQL_PASSWD
-sed -i 's/password:/password: ${MYSQL_PASSWD}/g' /var/www/gitorious/config/database.yml 
+sed -i "s/password:/password: ${MYSQL_PASSWD}/g" /var/www/gitorious/config/database.yml 
 
 
-## Set up database
-mv config/boot.rb config/boot.rb.orig
-echo "require 'thread'" > config/boot.rb.orig
-cat config/boot.rb.orig >> config.boot.rb
-
-su - git -c 'bundle install'
-su - git -c 'bundle pack'
-su - git -c 'rake db:migrate RAILS_ENV=production'
-su - git -c 'rake ultrasphinx:bootstrap RAILS_ENV=production'
-
-echo "* * * * * cd /var/www/gitorious && /usr/bin/bundle exec rake ultrasphinx:index RAILS_ENV=production" \
-	>> /var/spool/cron/crontabs/git
-
-chown git:crontab /var/spool/cron/crontabs/git
-chmod 600 /var/spool/cron/crontabs/git
-
-env RAILS_ENV=production ruby1.8 script/create_admin
 
 

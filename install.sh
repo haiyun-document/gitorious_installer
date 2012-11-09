@@ -84,7 +84,7 @@ ln -s /var/www/gitorious/script/gitorious /usr/bin
 read -p "PAUSE" CONTINUE
 
 ## Startup scripts
-cp scripts/{git-{daemon,poller,ultrasphinx},stomp} /etc/init.d/
+cp ${SCRIPT_DIR}/scripts/{git-{daemon,poller,ultrasphinx},stomp} /etc/init.d/
 chmod 755 /etc/init.d/{git-{daemon,poller,ultrasphinx},stomp}
 
 update-rc.d git-daemon defaults
@@ -205,13 +205,13 @@ COOKIE_SECRET=`apg -d -m 64`
 sed -i 's/\/var\/git\/repositories/\/var\/www\/gitorious\/repositories/g' /var/www/gitorious/config/gitorious.yml 
 sed -i 's/\/var\/git\/tarballs/\/var\/www\/gitorious\/tarballs/g' /var/www/gitorious/config/gitorious.yml 
 sed -i 's/\/var\/git\/tarballs-work/\/tmp\/tarballs-work/g' /var/www/gitorious/config/gitorious.yml 
-sed -i 's/ssssht/${COOKIE_SECRET}/g' /var/www/gitorious/config/gitorious.yml 
+sed -i "s/ssssht/${COOKIE_SECRET}/g" /var/www/gitorious/config/gitorious.yml 
 read -p "Enter server name [git.example.com]: " SERVER_NAME
-sed -i 's/gitorious_host: gitorious.test/gitorious_host: ${SERVER_NAME}/g' /var/www/gitorious/config/gitorious.yml 
+sed -i "s/gitorious_host: gitorious.test/gitorious_host: ${SERVER_NAME}/g" /var/www/gitorious/config/gitorious.yml 
 sed -i 's/#hide_http_clone_urls: false/hide_http_clone_urls: true/g' /var/www/gitorious/config/gitorious.yml 
 sed -i 's/#is_gitorious_dot_org: true/is_gitorious_dot_org: false/g' /var/www/gitorious/config/gitorious.yml 
 read -p "Enter admin email [admin@example.com]: " ADMIN_EMAIL
-sed -i 's/exception_notification_emails:/exception_notification_emails: ${ADMIN_EMAIL}/g' /var/www/gitorious/config/gitorious.yml 
+sed -i "s/exception_notification_emails:/exception_notification_emails: ${ADMIN_EMAIL}/g" /var/www/gitorious/config/gitorious.yml 
 
 ## Private repositories
 cat <<EOF
@@ -243,17 +243,15 @@ if [ "${PRIVATE_MODE}" = "y" ] ; then
 	sed -i 's/#public_mode: true/public_mode: false/g' /var/www/gitorious/config/gitorious.yml 
 fi
 
-read -p "PAUSE" CONTINUE
-
 ## MySQL password
 read -s -p "Enter root password fro mysql" MYSQL_PASSWD
-sed -i 's/password:/password: ${MYSQL_PASSWD}/g' /var/www/gitorious/config/database.yml 
+sed -i "s/password:/password: ${MYSQL_PASSWD}/g" /var/www/gitorious/config/database.yml 
 
 
 ## Set up the databases
 mv config/boot.rb config/boot.rb.orig
-echo "require 'thread'" > config/boot.rb.orig
-cat config/boot.rb.orig >> config.boot.rb
+echo "require 'thread'" > config/boot.rb
+cat config/boot.rb.orig >> config/boot.rb
 
 read -p "PAUSE" CONTINUE
 
@@ -274,5 +272,5 @@ chown -R git:git /var/www/gitorious
 
 read -p "PAUSE" CONTINUE
 
-env RAILS_ENV=production ruby1.8 script/create_admin
+su - git -c "env RAILS_ENV=production ruby1.8 script/create_admin"
 
